@@ -19,7 +19,7 @@
             <v-card-text>
                 <v-text-field v-model="search" label="Search products..." prepend-inner-icon="mdi-magnify" clearable
                     density="comfortable" variant="outlined" class="mb-4" />
-                <v-data-table :headers="headers" :items="productStore.products"
+                <v-data-table :headers="headers" :items="productStore.products" fixed-header
                     :sort-by="[{ key: 'name', order: 'asc' }]" sort-asc :search="search" :items-per-page="5"
                     class="elevation-1 rounded-lg" density="comfortable">
                     <template v-slot:no-data>
