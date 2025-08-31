@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" transition="dialog-bottom-transition" max-width="700" persistent>
+    <v-dialog v-model="dialog"  @click:outside="closeDialog" transition="dialog-bottom-transition" max-width="700" persistent>
         <v-card class="pa-4 rounded-t-xl">
             <v-card-title class="text-h6">
                 Add Product
@@ -13,7 +13,7 @@
                 <v-form ref="formRef" @submit.prevent="handleSubmit">
                     <v-row>
                         <v-col cols="12" sm="4">
-                            <v-text-field v-model.trim="name" label="Product Name" :rules="[required]" />
+                            <v-text-field v-model.trim="name" label="Product Name" :rules="[required, notNumber]" />
                         </v-col>
 
                         <v-col cols="12" sm="4">
@@ -55,6 +55,9 @@ const required = v => (v !== null && v !== undefined && v !== '') || 'Required'
 const positivePrice = v => Number(v) > 0 || 'Enter valid price'
 const nonNegative = v => Number(v) >= 0 || 'Enter valid qty'
 const integerOnly = v => Number.isInteger(Number(v)) || 'Must be an integer'
+const notNumber = v => isNaN(Number(v)) || 'Numbers are not allowed';
+
+
 
 async function handleSubmit() {
     const { valid } = await formRef.value.validate()
