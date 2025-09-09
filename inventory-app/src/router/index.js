@@ -3,10 +3,23 @@ import Login from '../views/Login.vue'
 import Products from '../views/Products.vue'
 import { useAuthStore } from '../stores/auth'
 import NotFound from "../views/NotFount.vue";
+import Dashboard from '../views/Dashboard.vue';
+import Cart from '../views/Cart.vue';
+
 
 const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
+  {
+    path: '/dashboard',
+    component: Dashboard,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/cart',
+    component: Cart,
+    meta: { requiresAuth: true }
+  },
   {
     path: '/products',
     component: Products,
@@ -25,8 +38,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+  const authStore = useAuthStore();
+  if (to.meta.requiresAuth && !authStore.accessToken) {
     next('/login')
   } else {
     next()

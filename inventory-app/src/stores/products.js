@@ -1,23 +1,60 @@
 import { defineStore } from 'pinia'
+import api from "../api.js"
 
 export const useProductStore = defineStore('products', {
   state: () => ({
-    products: [
-      { name: 'Laptop', price: 55000, quantity: 5 },
-      { name: 'Mouse', price: 500, quantity: 20 },
-      { name: 'Keyboard', price: 1500, quantity: 10 },
-      { name: 'Monitor', price: 12000, quantity: 3 },
-      { name: 'Printer', price: 8000, quantity: 4 },
-      { name: 'External Hard Drive', price: 6000, quantity: 8 },
-      { name: 'Smartphone', price: 30000, quantity: 7 },
-      { name: 'Tablet', price: 20000, quantity: 6 },
-      { name: 'Webcam', price: 2500, quantity: 15 },
-      { name: 'Headphones', price: 3500, quantity: 12 }
-    ]
+    products: [],
+    addToCart: [] // will hold {id, title, price, qty, images...}
   }),
+
+  getters: {
+    getProducts: (state) => state.products,
+    getCartItems: (state) => state.addToCart,
+    addToCartProductCount: (state) =>
+      state.addToCart.reduce((sum, item) => sum + item.qty, 0),
+    getCartTotal: (state) =>
+      state.addToCart.reduce((sum, item) => sum + item.price * item.qty, 0)
+  },
+
   actions: {
-    addProduct(product) {
-      this.products.push(product)
+    // Add to cart with qty check
+    addToCartProduct(product) {
+      const existing = this.addToCart.find((p) => p.id === product.id)
+      if (existing) {
+        existing.qty++
+      } else {
+        this.addToCart.push({ ...product, qty: 1 })
+      }
+    },
+
+    // Qty controls
+    increaseQty(id) {
+      const item = this.addToCart.find((p) => p.id === id)
+      if (item) item.qty++
+    },
+
+    decreaseQty(id) {
+      const item = this.addToCart.find((p) => p.id === id)
+      if (item && item.qty > 1) {
+        item.qty--
+      } else {
+        this.removeFromCart(id)
+      }
+    },
+
+    // Remove item
+    removeFromCart(id) {
+      this.addToCart = this.addToCart.filter((p) => p.id !== id)
+    },
+
+    // Fetch products from API
+    async fetchProducts() {
+      try {
+        const response = await api.get("/products")
+        this.products = response.data
+      } catch (error) {
+        console.error("Error fetching products:", error)
+      }
     }
   }
 })
